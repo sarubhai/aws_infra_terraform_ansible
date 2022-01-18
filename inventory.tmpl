@@ -1,0 +1,59 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_user: ec2-user
+    ansible_become: true
+    ansible_ssh_private_key_file: /home/ec2-user/.ssh/${keypair_name}.pem
+    ssl_enabled: true
+    health_checks_enabled: true
+    sasl_protocol: plain
+    jmxexporter_enabled: true
+    kafka_broker_schema_validation_enabled: true
+
+zookeeper:
+  hosts:
+%{ for index, addr in zookeeper_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+kafka_broker:
+  hosts:
+%{ for index, addr in kafka_broker_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+kafka_rest:
+  hosts:
+%{ for index, addr in rest_proxy_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+control_center:
+  hosts:
+%{ for index, addr in control_center_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+schema_registry:
+  hosts:
+%{ for index, addr in schema_registry_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+kafka_connect:
+  vars:
+    kafka_connect_confluent_hub_plugins:
+    - confluentinc/kafka-connect-jdbc:latest
+    - confluentinc/kafka-connect-oracle-cdc:latest
+    - mongodb/kafka-connect-mongodb:latest
+    - confluentinc/kafka-connect-http:latest
+  hosts:
+%{ for index, addr in kafka_connect_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
+
+ksql:
+  hosts:
+%{ for index, addr in ksql_instances_dns ~}
+    ${addr}:
+%{ endfor ~}
